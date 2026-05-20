@@ -1,0 +1,6 @@
+{
+  "name": "One-Person Commerce Copilot",
+  "description": "An AI-powered operational assistant and harness for solo cross-border e-commerce sellers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
