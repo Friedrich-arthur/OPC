@@ -1,37 +1,55 @@
-import React, { useState } from 'react';
-import { Sparkles, UploadCloud, AlertCircle, CheckCircle2, Image as ImageIcon, Video, FileText, Target, ChevronRight, PenTool, Table, ArrowRight, Gauge, BrainCircuit } from 'lucide-react';
-import { cn } from '../lib/utils';
+import React, { useState } from "react";
+import {
+  Sparkles,
+  AlertCircle,
+  CheckCircle2,
+  FileText,
+  Target,
+  ShieldCheck,
+  ArrowRight,
+  BrainCircuit,
+  Globe,
+  Key,
+  ListChecks,
+  CheckSquare,
+} from "lucide-react";
+import { cn } from "../lib/utils";
 
 export function ListingCopilotView() {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<0 | 1 | 2 | 3>(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [warningMsg, setWarningMsg] = useState('');
+  const [warningMsg, setWarningMsg] = useState("");
 
   const [inputs, setInputs] = useState({
-    productName: '',
-    sellingPoints: '',
-    keywords: '',
+    productName: "",
+    currentSellingPoints: "",
+    competitorLinks: "",
+    targetMarketplace: "Amazon",
+    constraints: "",
+    contactPath: "",
   });
 
-  const [hasImages, setHasImages] = useState(false);
-  const [hasKeywordTable, setHasKeywordTable] = useState(false);
-
   const handleAnalyze = () => {
-    let msg = '';
-    
+    let msg = "";
+
     if (inputs.productName.length < 2) {
-      msg = '麻烦写一下商品名称哦，连卖什么都不知道 AI 会抓瞎的啦！';
+      msg = "麻烦写一下商品名称 / Please enter product name";
       setWarningMsg(msg);
       return;
     }
-    if (inputs.sellingPoints.length < 5) {
-      msg = '随便写点卖点吧，告诉 AI 为什么要买它？哪怕是很简单的一句话也行。';
+    if (inputs.currentSellingPoints.length < 5) {
+      msg = "随便写点卖点吧 / Please describe some selling points";
+      setWarningMsg(msg);
+      return;
+    }
+    if (inputs.targetMarketplace === "") {
+      msg = "请选择目标平台 / Please select a target marketplace";
       setWarningMsg(msg);
       return;
     }
 
-    setWarningMsg('');
+    setWarningMsg("");
     setIsAnalyzing(true);
     setTimeout(() => {
       setIsAnalyzing(false);
@@ -48,408 +66,750 @@ export function ListingCopilotView() {
   };
 
   return (
-    <div className="space-y-6 w-full max-w-[1000px] mx-auto pb-10">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-indigo-500" />
-          全能商品内容生成 (Listing Copilot)
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          专为新手设计的上架神器 —— 只要提供最基础的商品信息和几张原图，一键为您生成 Listing 文案、主图排版、短视频脚本和广告测词策略。
-        </p>
-      </div>
+    <div className="w-full relative pb-10">
+      <div className="space-y-8 w-full max-w-[1100px] mx-auto relative z-10">
+        {/* Hero Section (Visible only when not generated yet) */}
+        {(step === 0 || step === 1) && (
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-10 relative animate-in fade-in zoom-in-[0.98] duration-700">
+            {/* Decorative background elements */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-50/50 rounded-full blur-[100px] pointer-events-none -mt-32 -mr-32"></div>
+            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-50/50 rounded-full blur-[80px] pointer-events-none -mb-20 -ml-20"></div>
 
-      {/* Step 1: Input */}
-      {step === 1 && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
-          <div className="p-6 md:p-8 space-y-8">
-            {warningMsg && (
-              <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex gap-3 text-amber-800 animate-in fade-in slide-in-from-top-2">
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
-                <div>
-                  <h4 className="font-bold text-sm text-amber-900">提示</h4>
-                  <p className="text-sm mt-1">{warningMsg}</p>
+            <div className="p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row gap-12 items-center relative z-10">
+              {/* Left Content */}
+              <div className="flex-1 space-y-8">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-widest">
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                  Product Page Launch Copilot
                 </div>
-              </div>
-            )}
 
-            <div className="space-y-4">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">1. 您要卖什么商品？ (名称与品类)</label>
-                <input 
-                  type="text"
-                  placeholder="例如：一款给1-3岁宝宝用的硅胶防摔餐盘..."
-                  className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
-                  value={inputs.productName}
-                  onChange={e => setInputs(prev => ({...prev, productName: e.target.value}))}
-                />
-              </div>
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
+                  把零散产品资料 <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                    一键出具可上线方案
+                  </span>
+                </h1>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">2. 它的核心卖点是什么？ (用自己的话随便写)</label>
-                <textarea 
-                  placeholder="例如：底部带吸盘不会被打翻，食品级硅胶没有味道，可以放洗碗机洗，颜色很丰富..."
-                  className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm h-28 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none"
-                  value={inputs.sellingPoints}
-                  onChange={e => setInputs(prev => ({...prev, sellingPoints: e.target.value}))}
-                />
-              </div>
+                <p className="text-base md:text-lg text-slate-600 leading-relaxed max-w-xl font-medium">
+                  提交产品资料、竞品和约束条件，OPC 为您快速出具基于 AI 的
+                  <strong className="text-slate-800">
+                    英文转化文案草案、差异化卖点和上线检查清单。
+                  </strong>{" "}
+                  并且，
+                  <span className="text-slate-900 font-bold border-b-2 border-indigo-200 pb-0.5">
+                    所有草案必须经过人工审核才能发布。
+                  </span>
+                </p>
 
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-1">
-                  <label className="block font-bold text-slate-700 mb-1 cursor-pointer">
-                    3. 目标搜索大词 (选填)
-                  </label>
-                  <input 
-                    type="text"
-                    placeholder="例如：baby plate..."
-                    className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
-                    value={inputs.keywords}
-                    onChange={e => setInputs(prev => ({...prev, keywords: e.target.value}))}
-                  />
+                <div className="space-y-4 pt-2">
+                  {[
+                    "AI 起草英文营销文案并评估证据缺口 (Evidence Gaps)",
+                    "人工负责审核确认，拒绝全自动发布的风险",
+                    "当前为测试演示阶段：不会真实保存数据，也不会产生费用",
+                  ].map((point, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 text-sm text-slate-700 font-medium bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-indigo-500 shrink-0" />
+                      <span>{point}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex-1">
-                  <label className="block font-bold text-slate-700 mb-1">4. 提供原始图片或参考图 (选填)</label>
-                  <div 
-                    className={cn(
-                      "border-2 border-dashed rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all h-[76px]",
-                      hasImages ? "border-emerald-400 bg-emerald-50" : "border-slate-300 bg-slate-50 hover:bg-slate-100"
-                    )}
-                    onClick={() => setHasImages(!hasImages)} // Toggle for demo
+
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 items-center">
+                  <button
+                    onClick={() => {
+                      setStep(1);
+                      setTimeout(() => {
+                        document
+                          .getElementById("intake-form")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }, 50);
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-black transition-all shadow-[0_8px_30px_rgba(79,70,229,0.3)] flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 group"
                   >
-                    {hasImages ? (
-                       <div className="flex items-center gap-3">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                          <p className="font-bold text-emerald-700 text-sm">已上传 1 张图 (点击取消)</p>
-                       </div>
-                    ) : (
-                       <div className="flex items-center gap-2">
-                          <UploadCloud className="w-5 h-5 text-slate-400" />
-                          <p className="font-bold text-slate-700 text-sm">点击模拟上传图片</p>
-                       </div>
-                    )}
+                    生成演示预览{" "}
+                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Pre-fill some demo data and jump to step 3
+                      setInputs({
+                        productName: "便携式制冰机 (Portable Ice Cream Maker)",
+                        currentSellingPoints:
+                          "15分钟极速制冰。\n小巧便携，适合户外。\n内置充电电池，无需插电。",
+                        competitorLinks: "https://amazon.com/...",
+                        targetMarketplace: "Amazon",
+                        constraints:
+                          "不能宣称达到商业级制冷标准。注意物流电池航空管制。",
+                        contactPath: "demo@example.com",
+                      });
+                      setStep(3);
+                    }}
+                    className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 px-8 py-4 rounded-xl font-bold transition-all flex items-center justify-center shadow-sm hover:shadow-md"
+                  >
+                    查看示例输出
+                  </button>
+                </div>
+
+                <div className="pt-2 text-xs text-slate-500 flex items-start gap-2 max-w-lg">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-indigo-500 mt-0.5" />
+                  <p className="leading-relaxed">
+                    <strong className="text-slate-700">Demo only.</strong>{" "}
+                    当前演示不会连接正式数据库。OPC 坚信 AI 是人类助手的延伸（
+                    <strong className="text-slate-700">
+                      AI drafts, human review required
+                    </strong>
+                    ）。
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Preview Card */}
+              <div
+                className="w-full lg:w-[460px] shrink-0 transform lg:translate-x-6 xl:translate-x-12"
+                style={{ perspective: "1000px" }}
+              >
+                <div
+                  className="bg-white text-slate-900 rounded-2xl border border-slate-200/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col transition-all duration-700 ease-out origin-right hover:!transform-none hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]"
+                  style={{
+                    transform: "rotateY(-10deg) rotateZ(2deg) scale(0.96)",
+                  }}
+                >
+                  <div className="bg-slate-50 border-b border-slate-100 flex items-center gap-2 px-4 py-3">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                    </div>
+                    <div className="flex-1 text-center text-[10px] font-mono text-slate-500 truncate tracking-wider">
+                      OPC-Launch-Protocol_Preview.pdf
+                    </div>
+                  </div>
+
+                  <div className="p-6 md:p-8 space-y-6">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded">
+                        AI Draft
+                      </span>
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 px-2.5 py-1 rounded flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" /> Human Review
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="h-5 w-4/5 bg-slate-200 rounded"></div>
+                      <div className="h-5 w-1/2 bg-slate-200 rounded"></div>
+                    </div>
+
+                    <div className="space-y-3 pt-4">
+                      <div className="flex gap-3">
+                        <div className="w-2 h-2 rounded-full bg-indigo-400 mt-1.5"></div>
+                        <div className="h-3 w-5/6 bg-slate-100 rounded"></div>
+                      </div>
+                      <div className="flex gap-3">
+                        <div className="w-2 h-2 rounded-full bg-indigo-400 mt-1.5"></div>
+                        <div className="h-3 w-full bg-slate-100 rounded"></div>
+                      </div>
+                      <div className="flex gap-3">
+                        <div className="w-2 h-2 rounded-full bg-indigo-400 mt-1.5"></div>
+                        <div className="h-3 w-4/6 bg-slate-100 rounded"></div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-6 border-t border-slate-100">
+                      <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+                        <Target className="w-5 h-5 text-indigo-500" />
+                      </div>
+                      <div className="space-y-2 flex-1 pt-1">
+                        <div className="text-xs font-bold text-slate-800">
+                          差异化卖点提炼
+                        </div>
+                        <div className="h-2 w-full bg-slate-100 rounded"></div>
+                        <div className="h-2 w-2/3 bg-slate-100 rounded"></div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
+                        <ListChecks className="w-5 h-5 text-emerald-500" />
+                      </div>
+                      <div className="space-y-2 flex-1 pt-1">
+                        <div className="text-xs font-bold text-slate-800">
+                          Launch 上线清单确认
+                        </div>
+                        <div className="h-2 w-3/4 bg-slate-100 rounded"></div>
+                        <div className="h-2 w-5/6 bg-slate-100 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-400/80 uppercase tracking-widest flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4" /> Operator Pending
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div className="pt-4 border-t border-slate-100">
-              <button 
-                onClick={handleAnalyze}
-                disabled={isAnalyzing}
-                className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-lg py-4 rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-70"
+          </div>
+        )}
+
+        {/* Step Indicators */}
+        {step > 0 && (
+          <div className="mb-10 w-full max-w-2xl mx-auto px-4 md:px-0">
+            <div className="flex items-start justify-between relative">
+              <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-200 -z-10 -translate-y-1/2 rounded-full"></div>
+              {/* Step 1 */}
+              <div className="flex flex-col items-center gap-2.5 bg-slate-50 px-2">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
+                    step >= 1
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                      : "bg-white border-2 border-slate-200 text-slate-400"
+                  }`}
+                >
+                  {step > 1 ? <CheckCircle2 className="w-5 h-5" /> : "1"}
+                </div>
+                <span
+                  className={`text-xs md:text-sm font-bold tracking-wide ${
+                    step >= 1 ? "text-indigo-900" : "text-slate-400"
+                  }`}
+                >
+                  Step 1: Input
+                </span>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex flex-col items-center gap-2.5 bg-slate-50 px-2">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
+                    step >= 2
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-200"
+                      : "bg-white border-2 border-slate-200 text-slate-400"
+                  }`}
+                >
+                  {step > 2 ? <CheckCircle2 className="w-5 h-5" /> : "2"}
+                </div>
+                <span
+                  className={`text-xs md:text-sm font-bold tracking-wide ${
+                    step >= 2 ? "text-indigo-900" : "text-slate-400"
+                  }`}
+                >
+                  Step 2: Assessment
+                </span>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex flex-col items-center gap-2.5 bg-slate-50 px-2">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300 ${
+                    step >= 3
+                      ? "bg-emerald-500 text-white shadow-md shadow-emerald-200"
+                      : "bg-white border-2 border-slate-200 text-slate-400"
+                  }`}
+                >
+                  3
+                </div>
+                <span
+                  className={`text-xs md:text-sm font-bold tracking-wide ${
+                    step >= 3 ? "text-emerald-600" : "text-slate-400"
+                  }`}
+                >
+                  Step 3: Result
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 1: Input */}
+        {step === 1 && (
+          <div
+            id="intake-form"
+            className="bg-white rounded-xl border border-slate-200 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden"
+          >
+            <div className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                1
+              </div>
+              <h3 className="font-bold text-slate-800">
+                提交产品原始资料 (Submit Materials)
+              </h3>
+            </div>
+            <div className="p-6 md:p-8 space-y-6">
+              {warningMsg && (
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg flex gap-3 text-amber-800 animate-in fade-in slide-in-from-top-2 mb-6">
+                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
+                  <div>
+                    <h4 className="font-bold text-sm text-amber-900">
+                      提示 / Notice
+                    </h4>
+                    <p className="text-sm mt-1">{warningMsg}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5 text-sm">
+                      产品或型号名称 / Product Name
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="例如：便携式制冰机 Portable Ice Cream Maker"
+                      className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none"
+                      value={inputs.productName}
+                      onChange={(e) =>
+                        setInputs((prev) => ({
+                          ...prev,
+                          productName: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1.5 text-sm">
+                      目标发布平台 / Target Marketplace
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <select
+                      className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none bg-white"
+                      value={inputs.targetMarketplace}
+                      onChange={(e) =>
+                        setInputs((prev) => ({
+                          ...prev,
+                          targetMarketplace: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="Amazon">Amazon</option>
+                      <option value="Shopify">Shopify (DTC独立站)</option>
+                      <option value="Mercado Libre">
+                        Mercado Libre (拉美)
+                      </option>
+                      <option value="Other">其他 (Other)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1.5 text-sm">
+                    当前的卖点、特性或规格 / Bullet Points & Specs
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <textarea
+                    placeholder="把从工厂拿到的参数、或者业务员总结的零散卖点直接贴在这里..."
+                    className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm h-24 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none"
+                    value={inputs.currentSellingPoints}
+                    onChange={(e) =>
+                      setInputs((prev) => ({
+                        ...prev,
+                        currentSellingPoints: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1.5 text-sm">
+                    参考竞品链接 / Competitor Links
+                  </label>
+                  <textarea
+                    placeholder="一行一个链接，可贴 Amazon ASIN 或独立站页面URL，AI将分析其差异化空间。"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm h-20 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none font-mono text-xs"
+                    value={inputs.competitorLinks}
+                    onChange={(e) =>
+                      setInputs((prev) => ({
+                        ...prev,
+                        competitorLinks: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1.5 text-sm">
+                    约束与合规条件 / Constraints & Compliance
+                  </label>
+                  <textarea
+                    placeholder="例如：目标人群是老年人、禁止宣称医疗功效、物流对体积有限制、必须强调环保材质..."
+                    className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm h-20 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none resize-none"
+                    value={inputs.constraints}
+                    onChange={(e) =>
+                      setInputs((prev) => ({
+                        ...prev,
+                        constraints: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1.5 text-sm">
+                    接收报告的联系方式 / Contact for Report
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="演示环境不会真实发送邮件"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none bg-slate-50 text-slate-400"
+                    value={inputs.contactPath}
+                    disabled
+                    onChange={(e) =>
+                      setInputs((prev) => ({
+                        ...prev,
+                        contactPath: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-slate-100">
+                <button
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing}
+                  className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-base py-3.5 rounded-xl shadow-md transition-all cursor-pointer disabled:opacity-70"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      AI 正在诊断资料完备度...
+                    </>
+                  ) : (
+                    <>
+                      开始评估资料成熟度 <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Assessment */}
+        {step === 2 && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+              <div className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                    2
+                  </div>
+                  <h3 className="font-bold text-slate-800">
+                    资料诊断结果 (Readiness Assessment)
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setStep(1)}
+                  className="text-sm text-slate-500 hover:text-slate-800 font-medium"
+                >
+                  修改原始资料
+                </button>
+              </div>
+
+              <div className="p-6 md:p-8 space-y-6">
+                <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                  <BrainCircuit className="w-6 h-6 text-indigo-500 mt-1 shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm">
+                      AI 诊断完成 (Diagnosis Complete)
+                    </h4>
+                    <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                      我们基于您提交的参数对{" "}
+                      <strong>{inputs.productName}</strong> 进行了分析。
+                      我们将采用适配 <strong>{inputs.targetMarketplace}</strong>{" "}
+                      的规则格式为您起草英文产品页结构。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="border border-emerald-200 bg-emerald-50 rounded-lg p-4">
+                    <h4 className="font-bold text-emerald-800 text-sm mb-2 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4" /> 具备生成条件 (Ready
+                      to action)
+                    </h4>
+                    <ul className="text-sm text-emerald-700 space-y-1.5 pl-5 list-disc marker:text-emerald-400">
+                      <li>已匹配 {inputs.targetMarketplace} 平台结构标准</li>
+                      <li>已成功提取核心功能参数</li>
+                      <li>已建立基础的竞品差异化模型</li>
+                    </ul>
+                  </div>
+
+                  <div className="border border-amber-200 bg-amber-50 rounded-lg p-4">
+                    <h4 className="font-bold text-amber-800 text-sm mb-2 flex items-center gap-1.5">
+                      <AlertCircle className="w-4 h-4" /> 发现审核风险 (Review
+                      Required)
+                    </h4>
+                    <ul className="text-sm text-amber-700 space-y-1.5 pl-5 list-disc marker:text-amber-400">
+                      {inputs.competitorLinks ? (
+                        <li>需要人工核实 AI 对竞品弱点的推断是否准确</li>
+                      ) : (
+                        <li>缺少竞品链接，差异化卖点将基于常规大盘推测</li>
+                      )}
+                      <li>视觉材料 (使用场景证据) 需要在后期补齐</li>
+                      <li>所有合规性声明必须经由人工 Checklist 确认</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-3">
+                  <button
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="px-6 py-3 rounded-xl font-bold text-white transition-all shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto bg-slate-800 hover:bg-slate-900 disabled:opacity-70"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>{" "}
+                        正在起草方案草案...
+                      </>
+                    ) : (
+                      "生成产品页方案体验版"
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Result */}
+        {step === 3 && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                产品上架方案演示报告包 (Demo Launch-page Package)
+              </h2>
+              <button
+                onClick={() => setStep(1)}
+                className="text-sm font-medium text-slate-500 hover:text-slate-800 bg-white border border-slate-200 px-4 py-2 rounded-lg shadow-sm transition-colors hover:bg-slate-50"
               >
-                {isAnalyzing ? (
-                   <>
-                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                     正在诊断当前物料能做什么...
-                   </>
-                ) : (
-                   <>
-                     第一步：AI 诊断与预检 <ArrowRight className="w-5 h-5" />
-                   </>
-                )}
+                重新测试
               </button>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Step 2: Assessment & Education */}
-      {step === 2 && (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6 md:p-8 space-y-6">
-             <div className="border-b border-slate-100 pb-4">
-               <div className="flex justify-between items-center">
-                 <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                   <BrainCircuit className="w-6 h-6 text-indigo-500" />
-                   数据认知与生成方案预检
-                 </h2>
-                 <button onClick={() => setStep(1)} className="text-sm text-slate-500 hover:text-slate-800 font-medium">返回修改基本素材</button>
-               </div>
-               <p className="text-sm text-slate-500 mt-1">AI 已经评估了您目前提供的数据物料，向您展示目前的“生成能力上限”与进阶建议。</p>
-             </div>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              {/* English Listing Draft */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col xl:col-span-2">
+                <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-indigo-500" />
+                  <h3 className="font-bold text-slate-800 flex-1">
+                    英文产品文案草案 (English Listing Draft)
+                  </h3>
+                  <span className="text-xs font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-200">
+                    AI 仅生成演示版本，非最终文案。
+                  </span>
+                </div>
+                <div className="p-6 space-y-6">
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">
+                      Title / 标题
+                    </p>
+                    <p className="text-base font-medium text-slate-900 leading-relaxed font-serif">
+                      {inputs.productName || "便携式制冰机"} - Essential
+                      Solution for Everyday Needs, Durable & Easy to Use
+                    </p>
+                  </div>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Available capability */}
-                <div className="bg-slate-50 rounded-lg p-5 border border-slate-200 shadow-inner flex flex-col">
-                   <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-4">
-                     <Gauge className="w-5 h-5 text-slate-500" />
-                     基于目前数据「能做什么」
-                   </h3>
-                   <ul className="space-y-4 text-sm text-slate-600 flex-1">
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">
+                      Hero Copy / 引言
+                    </p>
+                    <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-100">
+                      Discover the perfect balance of form and function.
+                      Designed specifically to address the modern challenges you
+                      face, the {inputs.productName || "Product"} integrates
+                      seamlessly into your life, providing immediate value from
+                      day one.
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-bold text-slate-400 mb-1.5 uppercase tracking-wider">
+                      Main Bullet Points / 核心特色项
+                    </p>
+                    <ul className="space-y-3 text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-100">
                       <li className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                        <div>
-                          <strong className="text-slate-800 block">基础 Listing 文本</strong>
-                          <span className="text-xs text-slate-500 mt-0.5 block">基于您提供的中文字面意思，做语法正确的英文翻译和结构排版。</span>
-                        </div>
+                        <span className="text-indigo-500 font-bold mt-0.5">
+                          •
+                        </span>
+                        <span className="leading-relaxed">
+                          <strong className="text-slate-800">
+                            BUILT FOR EFFICIENCY:
+                          </strong>{" "}
+                          {inputs.currentSellingPoints
+                            ? inputs.currentSellingPoints.split("\n")[0]
+                            : "Engineered to save you time and energy."}
+                        </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        {hasImages ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-                        )}
-                        <div>
-                          <strong className="text-slate-800 block">视觉内容</strong>
-                          <span className="text-xs text-slate-500 mt-0.5 block">
-                            {hasImages ? "已获取实物图，可提供主图修图排版建议及视频脚本。" : "【缺乏实拍图】仅能瞎编一套通用型的视频拍摄指导，没有实物画面对应。"}
-                          </span>
-                        </div>
+                        <span className="text-indigo-500 font-bold mt-0.5">
+                          •
+                        </span>
+                        <span className="leading-relaxed">
+                          <strong className="text-slate-800">
+                            PREMIUM QUALITY:
+                          </strong>{" "}
+                          Crafted with high-grade materials to ensure longevity
+                          and reliability, backed by rigorous quality control.
+                        </span>
                       </li>
-                      <li className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg border border-amber-100">
-                        <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-                        <div>
-                          <strong className="text-amber-800 block">流量获取与广告策略</strong>
-                          <span className="text-xs text-amber-700/80 mt-1 block leading-relaxed">
-                            【缺少深度的市场词库】仅能靠 AI 常识给一些诸如 "{inputs.keywords || '常见大词'}" 的通俗词。因为不知道这些词的真实市场竞争程度，直接去投流可能会浪费大量广告费。
-                          </span>
-                        </div>
+                      <li className="flex items-start gap-2">
+                        <span className="text-indigo-500 font-bold mt-0.5">
+                          •
+                        </span>
+                        <span className="leading-relaxed">
+                          <strong className="text-slate-800">
+                            VERSATILE DESIGN:
+                          </strong>{" "}
+                          Adapts to multiple use cases, ensuring you get the
+                          most out of your investment every single day.
+                        </span>
                       </li>
-                   </ul>
+                    </ul>
+                  </div>
                 </div>
+              </div>
 
-                {/* Education section */}
-                <div className={cn("rounded-xl p-6 border transition-all flex flex-col relative overflow-hidden", hasKeywordTable ? "bg-emerald-50 border-emerald-200" : "bg-blue-50 border-blue-200 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]")}>
-                   {hasKeywordTable && <div className="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>}
-                   
-                   <h3 className={cn("font-bold flex items-center gap-2 mb-4 relative z-10", hasKeywordTable ? "text-emerald-800" : "text-blue-800")}>
-                     {hasKeywordTable ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <Sparkles className="w-5 h-5 flex-shrink-0" />}
-                     {hasKeywordTable ? "完美！您已解锁「高转化数据形态」" : "💡 AI 进阶建议：上传表单解锁「爆单形态」"}
-                   </h3>
-                   
-                   {hasKeywordTable ? (
-                     <div className="flex-1 flex flex-col justify-between relative z-10">
-                       <p className="text-sm text-emerald-700 leading-relaxed bg-white/60 p-4 rounded-lg border border-emerald-100 shadow-sm">
-                         太棒了！我们成功读取了数据表中的：<br/>
-                         <strong>搜索词、精确月搜索量、竞争度、预估 CPC</strong>。
-                       </p>
-                       <div className="mt-4">
-                         <p className="font-bold text-emerald-800 text-sm mb-2">生成能力将得到蜕变：</p>
-                         <ul className="text-xs text-emerald-700 space-y-2 pl-4 list-disc marker:text-emerald-500">
-                           <li>标题和卖点自动注入 <strong className="font-bold">高搜索/低竞争</strong> 的长尾词，拦截免费自然流量。</li>
-                           <li>为您生成精确到美分的 CPC 出价建议表，把每一分广告费花在刀刃上。</li>
-                         </ul>
-                       </div>
-                     </div>
-                   ) : (
-                     <div className="space-y-4 flex-1 flex flex-col justify-between">
-                       <p className="text-sm text-blue-800 leading-relaxed">
-                         如果您手上有一份竞品或同类目的<strong>「关键词搜索词洞察表」</strong>（例如从卖家后台导出的 Excel 报表），请一并提供给我们。
-                       </p>
-                       <div className="bg-white/50 p-3 rounded-lg border border-blue-100">
-                         <p className="text-xs font-bold text-blue-900 mb-1">仅需包含以下列，AI 即可化腐朽为神奇：</p>
-                         <ul className="text-xs text-blue-700 space-y-1 pl-4 list-disc marker:text-blue-400">
-                           <li>搜索词 (Search Term)</li>
-                           <li>月搜索量 (Search Volume)</li>
-                           <li>竞争商品数或竞争激烈度</li>
-                         </ul>
-                       </div>
-                       <div 
-                         onClick={() => setHasKeywordTable(true)} // Simulation logic
-                         className="mt-2 border border-dashed border-blue-400 bg-white hover:bg-blue-100/50 text-blue-600 hover:text-blue-700 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition-colors shadow-sm relative group overflow-hidden"
-                       >
-                         <div className="absolute inset-0 bg-blue-50/50 translate-y-full group-hover:translate-y-0 transition-transform"></div>
-                         <Table className="w-6 h-6 mb-1 opacity-70 relative z-10" />
-                         <span className="font-bold text-sm relative z-10">点此处：模拟挂载一份关键词 CSV 表格</span>
-                         <span className="text-[10px] opacity-70 text-center mt-1 relative z-10">体验 AI 结合大盘数据进行精细化内容生成</span>
-                       </div>
-                     </div>
-                   )}
+              {/* Differentiated Selling Points */}
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
+                  <Target className="w-5 h-5 text-emerald-500" />
+                  <h3 className="font-bold text-slate-800">
+                    差异化卖点提炼 (Differentiated Selling Points)
+                  </h3>
                 </div>
-             </div>
-
-             <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-3 mt-4">
-                {!hasKeywordTable && (
-                  <button 
-                     onClick={handleGenerate}
-                     disabled={isGenerating}
-                     className="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-600 font-bold hover:bg-slate-50 transition-colors text-sm w-full sm:w-auto"
-                  >
-                    没有表格，直接生成基础版
-                  </button>
-                )}
-                <button 
-                   onClick={handleGenerate}
-                   disabled={isGenerating}
-                   className={cn(
-                     "px-6 py-2.5 rounded-lg font-bold text-white transition-all shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto", 
-                     hasKeywordTable ? "bg-emerald-600 hover:bg-emerald-700 ring-4 ring-emerald-500/20" : "bg-blue-600 hover:bg-blue-700 disabled:opacity-70"
-                   )}
-                >
-                  {isGenerating ? (
-                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> 努力合成中...</>
-                  ) : (
-                    hasKeywordTable ? "开始生成！(满配爆单版)" : "我也要生成基础版"
-                  )} 
-                </button>
-             </div>
-           </div>
-        </div>
-      )}
-
-      {/* Step 3: Result */}
-      {step === 3 && (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-               生成完毕！请查看您的素材包配置
-               {hasKeywordTable && <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full ml-1 border border-emerald-200">数据驱动精准版</span>}
-            </h2>
-            <button 
-              onClick={() => {
-                setStep(1);
-                setHasKeywordTable(false);
-              }}
-              className="text-sm font-medium text-slate-500 hover:text-slate-800 bg-white border border-slate-200 px-3 py-1.5 rounded-md shadow-sm transition-colors hover:bg-slate-50"
-            >
-              重新开始
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {/* Listing Section */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-              <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-500" />
-                <h3 className="font-bold text-slate-800">1. Listing 原文 (排版与埋词)</h3>
-              </div>
-              <div className="p-5 space-y-5">
-                 <div className="text-xs font-medium text-indigo-700 bg-indigo-50/50 px-3 py-2 rounded-md border border-indigo-100 w-full">
-                   💡 {hasKeywordTable ? "基于您上传的《关键词洞察表》，我们直接将搜索量高达万级的蓝海长尾词（高亮标出）预埋到了权重最高的标题和卖点首行。" : "提示：这是基于您的只言片语做的一般性翻译和语态优化。因为没有大盘词汇数据，只能按常识提供泛流通词。"}
-                 </div>
-                 
-                 <div>
-                   <p className="text-xs font-bold text-slate-400 mb-1.5">高权重标题框架 (Title)</p>
-                   <p className="text-sm font-medium text-slate-800 bg-slate-50 p-4 rounded-lg border border-slate-100 leading-relaxed shadow-inner">
-                     {inputs.productName} - 
-                     {hasKeywordTable ? <span className="bg-yellow-100 text-yellow-900 font-bold px-1 rounded mx-1">Toddler Silicone Feeding Plate with Suction</span> : <span className="mx-1">Baby Plates</span>} 
-                     {inputs.sellingPoints.slice(0, 20)}... Easy to Use & Safe For Kid
-                   </p>
-                 </div>
-                 
-                 <div>
-                   <p className="text-xs font-bold text-slate-400 mb-1.5">五大核心卖点摘要 (Bullet Points)</p>
-                   <ul className="space-y-3 text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-100 shadow-inner">
-                     <li className="flex items-start gap-2">
-                       <span className="text-indigo-500 font-bold mt-0.5">•</span>
-                       <span className="leading-relaxed"><strong className="text-slate-800">✅ 击中痛点：</strong>{inputs.sellingPoints.slice(0, 15)}... {hasKeywordTable && <span className="font-bold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded mx-1 pb-1 inline-block">(已埋词: Non-SLIP bowl stay put)</span>} 增加代入感。</span>
-                     </li>
-                     <li className="flex items-start gap-2">
-                       <span className="text-indigo-500 font-bold mt-0.5">•</span>
-                       <span className="leading-relaxed"><strong className="text-slate-800">✅ 材质保证：</strong>重点突出了安全环保材质。</span>
-                     </li>
-                     <li className="flex items-start gap-2 text-slate-400">... (展示其余条目以供粘贴复制)</li>
-                   </ul>
-                 </div>
-              </div>
-            </div>
-
-            {/* Visual Section */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-              <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-pink-500" />
-                <h3 className="font-bold text-slate-800">2. 视觉营销 (主图设计与视频脚本)</h3>
-              </div>
-              <div className="p-5 space-y-5">
-                 
-                 <div>
-                   <p className="text-xs font-bold text-slate-400 mb-1.5">主图拆解建议与文案</p>
-                   <div className="flex gap-4">
-                     <div className="w-[120px] aspect-square bg-slate-100 rounded-lg p-2.5 border border-slate-200 flex flex-col justify-between shadow-inner relative overflow-hidden group shrink-0">
-                       <div className="text-[10px] font-black text-slate-700 w-full z-10 leading-tight bg-white/80 p-1 rounded backdrop-blur-sm">稳固吸盘<br/>打不翻</div>
-                       {hasImages && <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&auto=format&fit=crop')] bg-cover bg-center transition-transform group-hover:scale-110"></div>}
-                     </div>
-                     <div className="flex-1 rounded-lg border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600 flex flex-col justify-center">
-                       <p className="leading-relaxed">📸 <strong>主图首发:</strong> 展现产品全貌，左上角加大字号标出痛点词。{hasKeywordTable && <span className="font-bold text-pink-600 block mt-1">（因为数据表显示 "spill proof" 是被热搜的，建议大字打在图上作为视觉锤）</span>}</p>
-                     </div>
-                   </div>
-                 </div>
-
-                 <div className="mt-4">
-                   <p className="text-xs flex items-center gap-1 font-bold text-slate-400 mb-1.5"><Video className="w-4 h-4 text-purple-400" /> 短剧化商品展示视频脚本</p>
-                   <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-sm shadow-inner">
-                     <p className="leading-relaxed">
-                       <span className="font-bold text-purple-600 bg-purple-100 px-1.5 py-0.5 rounded text-[10px] mr-2">前 3 秒</span> 
-                       <span className="text-slate-700">展示令人崩溃的痛点场景锁定注意力。</span>
-                     </p>
-                     <p className="mt-3 leading-relaxed">
-                       <span className="font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded text-[10px] mr-2">3-8 秒</span> 
-                       <span className="text-slate-700">产品特写展示，直接演示产品如何解决这一痛点，配合强有力的音效与字幕。</span>
-                     </p>
-                   </div>
-                 </div>
-              </div>
-            </div>
-
-            {/* Ads Section */}
-            <div className="xl:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col relative overflow-hidden">
-               {hasKeywordTable && <div className="absolute right-0 top-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>}
-              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between z-10 relative bg-slate-50/50">
-                 <div className="flex items-center gap-2">
-                   <Target className={cn("w-5 h-5", hasKeywordTable ? "text-emerald-500" : "text-amber-500")} />
-                   <h3 className="font-bold text-slate-800">3. 广告投流建议 (PPC 起手式)</h3>
-                 </div>
-              </div>
-              <div className="p-6 flex flex-col md:flex-row gap-8 z-10 relative">
-                <div className="md:w-1/3 flex flex-col justify-center">
-                  {hasKeywordTable ? (
-                    <div className="space-y-4">
-                      <p className="text-sm font-medium text-slate-700 leading-relaxed">
-                        利用您提供的数据表格，我们帮您筛选出了最适合首发推广的<strong className="text-emerald-600 font-bold bg-emerald-50 px-1 rounded">低竞争、高转化的长尾跑量词</strong>。
-                      </p>
-                      <p className="text-xs text-slate-500 border-l-2 border-emerald-300 pl-3 leading-relaxed">这些词已经根据搜索量和竞争激烈度做过交叉比对，照着开手动广告稳赚不赔。</p>
+                <div className="p-6 space-y-4">
+                  {[
+                    {
+                      t: "维护成本极低",
+                      v: "经测算可减少50%的日常清洁时间",
+                      p: "用户普遍痛点：讨厌复杂的拆卸重装",
+                      g: "需要：一次完整的拆装清洗实录视频以自证",
+                    },
+                    {
+                      t: "超长耐用性承诺",
+                      v: "使用寿命长于同价竞品3倍",
+                      p: "用户普遍痛点：竞品经常出现易耗件损坏",
+                      g: "需要：实验室压力测试或材质证明报告",
+                    },
+                  ].map((point, idx) => (
+                    <div
+                      key={idx}
+                      className="border border-slate-200 rounded-lg p-4 bg-white relative"
+                    >
+                      <h4 className="font-bold text-slate-800 text-sm mb-2">
+                        {point.t}
+                      </h4>
+                      <div className="text-xs space-y-1.5 text-slate-600">
+                        <p>
+                          <span className="font-medium text-slate-400 w-16 inline-block">
+                            用户价值:
+                          </span>{" "}
+                          {point.v}
+                        </p>
+                        <p>
+                          <span className="font-medium text-slate-400 w-16 inline-block">
+                            解决痛点:
+                          </span>{" "}
+                          {point.p}
+                        </p>
+                        <p className="text-amber-600 bg-amber-50 px-2 py-1.5 rounded mt-2 inline-block">
+                          <span className="font-semibold w-14 inline-block">
+                            落地缺口:
+                          </span>{" "}
+                          {point.g}
+                        </p>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <p className="text-sm font-medium text-slate-700 leading-relaxed">
-                        由于<strong className="text-amber-600 font-bold bg-amber-50 px-1 rounded">缺少准确的市场数据支撑</strong>，这里只能给您推荐一些泛泛的、AI 常识推荐的品类词语。
-                      </p>
-                      <p className="text-xs text-slate-500 border-l-2 border-amber-300 pl-3 leading-relaxed">警告：这些短词竞争可能极大（很烧钱），或者搜索量极小，建议先以自动广告为主跑一跑报表再看。</p>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex-1">
-                  {hasKeywordTable ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {[
-                        {w: '"toddler silicone suction plate"', s: '12,400+', c: '$0.42 / 高转化'},
-                        {w: '"spill proof baby bowl set"', s: '8,350+', c: '$0.35 / 竞争小'},
-                        {w: '"best plate for 1 yr old"', s: '5,120+', c: '$0.28 / 蓝海长尾'}
-                      ].map((kw, i) => (
-                        <div key={i} className="flex flex-col justify-between bg-white border border-emerald-100 p-4 rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
-                          <span className="font-mono text-sm font-bold text-slate-800 mb-2 truncate" title={kw.w}>{kw.w}</span>
-                          <div className="flex justify-between items-end">
-                            <span className="text-[10px] text-slate-500 font-medium">月检索量 <strong className="text-emerald-600">{kw.s}</strong></span>
-                            <span className="text-[10px] font-bold text-white bg-emerald-500 px-2.5 py-1 rounded-md shadow-sm">{kw.c}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 opacity-80">
-                      {[
-                        {w: '"baby plate"', c: '极高'},
-                        {w: '"feeding bowl"', c: '偏高'},
-                        {w: '"silicone plate"', c: '中等'}
-                      ].map((kw, i) => (
-                        <div key={i} className="flex justify-between items-center bg-slate-50 border border-slate-200 px-4 py-4 rounded-xl">
-                          <span className="font-mono text-xs font-bold text-slate-700">{kw.w}</span>
-                          <span className="flex items-center gap-1.5"><span className="text-[10px] text-slate-500">预估竞争度</span><span className="text-[10px] font-bold text-slate-600 bg-slate-200 px-2 py-0.5 rounded">{kw.c}</span></span>
-                        </div>
-                      ))}
+                  ))}
+                  {inputs.constraints && (
+                    <div className="text-xs text-slate-500 mt-2 italic">
+                      * 上述卖点已严格遵守您的硬性约束条件："
+                      {inputs.constraints.slice(0, 50)}..."
                     </div>
                   )}
                 </div>
               </div>
-            </div>
 
+              {/* Launch Checklist & Process Info */}
+              <div className="space-y-6">
+                {/* Checklist */}
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                  <div className="bg-slate-50/80 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
+                    <ListChecks className="w-5 h-5 text-blue-500" />
+                    <h3 className="font-bold text-slate-800">
+                      发布前人工检查清单 (Launch Checklist)
+                    </h3>
+                  </div>
+                  <div className="p-5">
+                    <ul className="space-y-3">
+                      {[
+                        "核心参数表与实物最终确认核准",
+                        "安全及认证声明已由合规法务通过",
+                        "大盘定价策略已与竞品最新活动对齐",
+                        "高清主图和视频素材集已备齐",
+                        "物流参数及包材符合目的国规避条件",
+                        "最终英文文案已经由 Native Speaker/运营人工审核",
+                      ].map((check, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <CheckSquare className="w-4 h-4 text-slate-300 mt-0.5 shrink-0" />
+                          <span className="text-sm font-medium text-slate-600">
+                            {check}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Evidence Gaps */}
+                <div className="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden flex flex-col relative">
+                  <div className="bg-amber-50 px-5 py-3 border-b border-amber-100 flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                    <h3 className="font-bold text-amber-900">
+                      核心证据缺失 (Evidence Gaps)
+                    </h3>
+                  </div>
+                  <div className="p-5 text-sm text-amber-800 space-y-2">
+                    <p className="font-medium mb-3">
+                      为避免 AI 幻觉和虚假宣传合规风险，请在上线前补齐：
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 opacity-90">
+                      <li>缺少高清使用场景实拍图</li>
+                      <li>缺少关键材质的质检及认证证明文件</li>
+                      <li>缺少明确的售后及保修限制声明</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Human Review Status */}
+                <div className="bg-slate-800 rounded-xl border border-slate-700 shadow-sm overflow-hidden flex flex-col relative text-white">
+                  <div className="p-6 flex items-start gap-4">
+                    <Key className="w-8 h-8 text-emerald-400 shrink-0" />
+                    <div>
+                      <h3 className="font-bold text-lg text-emerald-400 mb-1">
+                        上线前必须进行人工审查
+                      </h3>
+                      <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                        AI Drafts. Human Confirms.
+                        我们的系统不会自动将这些草案直接推送到前台。这份文案草稿和差异化策略，必须在您的业务团队确认无误后，才可用于{" "}
+                        {inputs.targetMarketplace || "Amazon"} 的正式投产。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

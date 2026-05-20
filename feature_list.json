@@ -1,0 +1,13 @@
+{
+  "features": [
+    {
+      "id": "ci-minimal-gates",
+      "status": "blocked",
+      "reason": "Blocked by missing GitHub remote CI run / GitHub push auth."
+    },
+    {
+      "id": "website-v11-lead-capture-flow",
+      "status": "completed"
+    }
+  ]
+}
