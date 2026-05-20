@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { SKU, AISuggestion, SuggestionStatus } from '../types';
 import { initialSKUs, initialSuggestions } from '../data/initialState';
 
-export type ViewState = 'dashboard' | 'inventory' | 'trace' | 'config' | 'settings';
+export type ViewState = 'dashboard' | 'inventory' | 'trace' | 'config' | 'settings' | 'listing';
 
 interface CopilotContextType {
   currentView: ViewState;

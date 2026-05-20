@@ -116,9 +116,17 @@ export const SuggestionCard: React.FC<Props> = ({ suggestion, compact = false })
             </button>
           </div>
         ) : (
-          <div className="mt-2 text-[10px] text-slate-400 font-medium pt-2 border-t border-slate-100">
-            人工复核操作于 {new Date(suggestion.resolvedAt!).toLocaleTimeString()} (由后台账号 {suggestion.resolvedBy} 执行)
-            {suggestion.feedback && <span className="italic block mt-1.5 bg-slate-50 border border-slate-100 p-2 text-slate-600 rounded">" {suggestion.feedback} "</span>}
+          <div className="mt-2 text-[10px] text-slate-400 font-medium pt-2 border-t border-slate-100 flex flex-col space-y-2">
+            <div>
+              人工复核操作于 {new Date(suggestion.resolvedAt!).toLocaleDateString()} {new Date(suggestion.resolvedAt!).toLocaleTimeString()} (由后台账号 {suggestion.resolvedBy} 执行)
+              {suggestion.feedback && <span className="italic block mt-1.5 bg-slate-50 border border-slate-100 p-2 text-slate-600 rounded">" {suggestion.feedback} "</span>}
+            </div>
+            {suggestion.impact && (
+              <div className="mt-2 bg-emerald-50/50 border border-emerald-100 p-3 rounded text-emerald-800 text-xs">
+                <span className="font-bold flex items-center gap-1.5 mb-1"><TrendingDown className="w-3.5 h-3.5 text-emerald-600 rotate-180" /> 决策后果数据回传与复盘</span>
+                <span className="leading-relaxed opacity-90">{suggestion.impact}</span>
+              </div>
+            )}
           </div>
         )}
       </div>

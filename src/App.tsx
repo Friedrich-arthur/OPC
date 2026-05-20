@@ -4,6 +4,7 @@ import { DashboardView } from './views/DashboardView';
 import { InventoryView } from './views/InventoryView';
 import { DecisionTraceView } from './views/DecisionTraceView';
 import { ConfigView } from './views/ConfigView';
+import { ListingCopilotView } from './views/ListingCopilotView';
 
 function ViewManager() {
   const { currentView } = useCopilot();
@@ -13,6 +14,8 @@ function ViewManager() {
       return <DashboardView />;
     case 'inventory':
       return <InventoryView />;
+    case 'listing':
+      return <ListingCopilotView />;
     case 'trace':
       return <DecisionTraceView />;
     case 'config':

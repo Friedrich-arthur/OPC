@@ -31,6 +31,7 @@ export interface AISuggestion {
   resolvedAt?: string;
   resolvedBy?: string;
   feedback?: string;
+  impact?: string;
 }
 
 export interface Metric {

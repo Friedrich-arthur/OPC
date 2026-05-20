@@ -1,4 +1,4 @@
-import { BarChart3, PackageOpen, ClipboardList, Database } from 'lucide-react';
+import { BarChart3, PackageOpen, ClipboardList, Database, Wand2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useCopilot } from '../../context/CopilotContext';
 
@@ -8,6 +8,7 @@ export function Sidebar() {
   const navItems = [
     { id: 'dashboard', label: '经营总览', icon: BarChart3 },
     { id: 'inventory', label: '库存管理', icon: PackageOpen },
+    { id: 'listing', label: 'AI 内容创作', icon: Wand2 },
     { id: 'trace', label: '决策追踪', icon: ClipboardList },
     { id: 'config', label: 'AI 规则墙', icon: Database },
   ] as const;
